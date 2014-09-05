@@ -100,6 +100,14 @@ Peer.prototype.handleMessage = function (message) {
 
 // send via signalling channel
 Peer.prototype.send = function (messageType, payload) {
+  // the Temasys plugin sends a weird candidate object, istead of this simple JSON object
+  // so we'll construct it here. Non-plugin browsers are essentially already doing this
+  if(messageType === 'candidate'){
+    payload = {candidate:
+                     {candidate: payload.candidate.candidate,
+                      sdpMLineIndex: payload.candidate.sdpMLineIndex,
+                      sdpMid: payload.candidate.sdpMid}};
+   }
     var message = {
         to: this.id,
         broadcaster: this.broadcaster,
