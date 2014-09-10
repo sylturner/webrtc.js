@@ -66,12 +66,15 @@ function WebRTC(opts) {
     // call localMedia constructor
     localMedia.call(this, this.config);
 
+    // implementing lazd's 'fix' from https://github.com/HenrikJoreteg/webrtc.js/issues/14
+    // changing data channel to the simplewebrtc one that's already being used
+    // instead of the ones named 'hark' which browsers seem to keep alive
     this.on('speaking', function () {
       if (!self.hardMuted) {
         // FIXME: should use sendDirectlyToAll, but currently has different semantics wrt payload
         self.peers.forEach(function (peer) {
-          if (peer.enableDataChannels) {
-            var dc = peer.getDataChannel('hark');
+          if (peer.enableDataChannels && peer.channels.simplewebrtc) {
+            var dc = peer.getDataChannel('simplewebrtc');
             if (dc.readyState != 'open') return;
             dc.send(JSON.stringify({type: 'speaking'}));
           }
@@ -82,8 +85,8 @@ function WebRTC(opts) {
       if (!self.hardMuted) {
         // FIXME: should use sendDirectlyToAll, but currently has different semantics wrt payload
         self.peers.forEach(function (peer) {
-          if (peer.enableDataChannels) {
-            var dc = peer.getDataChannel('hark');
+          if (peer.enableDataChannels && peer.channels.simplewebrtc) {
+            var dc = peer.getDataChannel('simplewebrtc');
             if (dc.readyState != 'open') return;
             dc.send(JSON.stringify({type: 'stoppedSpeaking'}));
           }
@@ -94,8 +97,8 @@ function WebRTC(opts) {
       if (!self.hardMuted) {
         // FIXME: should use sendDirectlyToAll, but currently has different semantics wrt payload
         self.peers.forEach(function (peer) {
-          if (peer.enableDataChannels) {
-            var dc = peer.getDataChannel('hark');
+          if (peer.enableDataChannels && peer.channels.simplewebrtc) {
+            var dc = peer.getDataChannel('simplewebrtc');
             if (dc.readyState != 'open') return;
             dc.send(JSON.stringify({type: 'volume', volume: volume }));
           }
